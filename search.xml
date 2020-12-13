@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>Docker中安装Elasticsearch</title>
+      <link href="2020/12/12/docker-zhong-an-zhuang-elasticsearch/"/>
+      <url>2020/12/12/docker-zhong-an-zhuang-elasticsearch/</url>
+      
+        <content type="html"><![CDATA[<p>Docker给开发人员带来了极大的便利性；舍弃那些安装包和配置环境，拾起<code>docker pull</code>一把梭哈。</p><p>本文涉及到的所有版本号都是<code>7.9.3</code></p><p><a href="https://hub.docker.com/" target="_blank" rel="noopener">Docker镜像地址</a></p><h3 id="安装Elasticsearch"><a href="#安装Elasticsearch" class="headerlink" title="安装Elasticsearch"></a>安装Elasticsearch</h3><p>拉取镜像命令</p><pre class=" language-bash"><code class="language-bash">docker pull elasticsearch:7.9.3</code></pre><h3 id="创建Elasticsearch容器并运行"><a href="#创建Elasticsearch容器并运行" class="headerlink" title="创建Elasticsearch容器并运行"></a>创建Elasticsearch容器并运行</h3><pre class=" language-bash"><code class="language-bash">docker run -d -e ES_JAVA_OPTS<span class="token operator">=</span><span class="token string">"-Xms512m -Xmx512m"</span> --name elasticsearch -p 9200:9200 -p 9300:9300 -e <span class="token string">"discovery.type=single-node"</span> 1ab13f928dc8</code></pre><p>命令解释：</p><p>-d：后台运行容器，并返回容器ID；</p><p>-e：设置环境变量；</p><ul><li>设置es内存堆大小 ES_JAVA_OPTS=”-Xms512m -Xmx512m”</li><li>设置为单机节点 “discovery.type=single-node”</li></ul><p>–name：为容器指定一个名称；</p><p>-p：指定端口映射，格式为：<strong>主机(宿主)端口:容器端口</strong></p><p>最后带上镜像id或者名称，成功后会返回容器id</p><p>浏览器地址中输入<code>http://localhost:9200/?pretty</code>验证是否安装成功,出现下图则表示安装成功。</p><p><img src="/images/Docker%E4%B8%AD%E5%AE%89%E8%A3%85Elasticsearch/1.png" alt="es安装验证"></p><h3 id="Elasticsearch安装ik分词器"><a href="#Elasticsearch安装ik分词器" class="headerlink" title="Elasticsearch安装ik分词器"></a>Elasticsearch安装ik分词器</h3><p>分词器版本应和es版本对应 <a href="https://github.com/medcl/elasticsearch-analysis-ik/releases" target="_blank" rel="noopener">ik分词器地址</a></p><p>这里我们采用在线安装的方法简单一些，不用去下载到本地再扔到相应的文件中。</p><pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 我们使用的是Docker for windows 切换到linux模式，右键 Switch to linux containers... </span><span class="token comment" spellcheck="true"># 进入容器</span>docker <span class="token function">exec</span> -it elasticsearch /bin/bash 或者 winpty docker <span class="token function">exec</span> -it elasticsearch <span class="token function">bash</span><span class="token comment" spellcheck="true"># 安装命令</span>./bin/elasticsearch-plugin <span class="token function">install</span>  https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.9.3/elasticsearch-analysis-ik-7.9.3.zip</code></pre><p><img src="/images/Docker%E4%B8%AD%E5%AE%89%E8%A3%85Elasticsearch/3.png" alt="安装成功"></p><p>安装成功后编辑<code>plugin-descriptor.properties</code>文件，查看文件末尾是否有版本号<code>elasticsearch.version=7.9.3</code>没有就加上</p><p><img src="/images/Docker%E4%B8%AD%E5%AE%89%E8%A3%85Elasticsearch/4.png" alt="plugin-descriptor.properties"></p><h3 id="安装Kibana"><a href="#安装Kibana" class="headerlink" title="安装Kibana"></a>安装Kibana</h3><p>拉取镜像命令</p><pre class=" language-bash"><code class="language-bash">docker pull kibana:7.9.3</code></pre><h3 id="创建Kibana容器并运行"><a href="#创建Kibana容器并运行" class="headerlink" title="创建Kibana容器并运行"></a>创建Kibana容器并运行</h3><pre class=" language-bash"><code class="language-bash">docker run -d -p 5601:5601 --name kibana --link elasticsearch -e <span class="token string">"ELASTICSEARCH_URL=http://本机ip地址:9200"</span> f9f7fac59a10</code></pre><p>–link：链接到另一个容器</p><p>Kibana在6.7之后的版本可以指定语言，配置文件中指定就可以了</p><p>进入Kibana容器</p><pre class=" language-bash"><code class="language-bash">docker <span class="token function">exec</span> -it kibana /bin/bash 或者 winpty docker <span class="token function">exec</span> -it kibana <span class="token function">bash</span><span class="token function">cd</span> config<span class="token function">vi</span> kibana.ym<span class="token comment" spellcheck="true"># 在kibana.yml配置文件中新增一行:</span>i18n.locale: <span class="token string">"zh-CN"</span><span class="token comment" spellcheck="true"># 保存退出重启容器即可</span></code></pre><p>浏览器中输入地址<code>http://localhost:5601</code>，进入后即可。可以在Kibana控制台中输入命令查看集群健康状态等：</p><p><img src="/images/Docker%E4%B8%AD%E5%AE%89%E8%A3%85Elasticsearch/2.png" alt="集群健康状态"></p><p>最后附上两个Elasticsearch文档地址</p><p><a href="https://learnku.com/docs/elasticsearch73/7.3" target="_blank" rel="noopener">Elasticsearch中文文档</a></p><p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html" target="_blank" rel="noopener">Elasticsearch-API</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Docker </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Elasticsearch </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>RabbitMQ学习(二)</title>
       <link href="2019/11/07/rabbitmq-xue-xi-er/"/>
       <url>2019/11/07/rabbitmq-xue-xi-er/</url>
@@ -13,14 +38,14 @@
       
       <categories>
           
-          <category> SpringBoot相关学习 </category>
+          <category> RabbitMQ </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> SpringBoot </tag>
+            <tag> RabbitMQ </tag>
             
         </tags>
       
@@ -38,7 +63,7 @@
       
       <categories>
           
-          <category> Java基础 </category>
+          <category> Java </category>
           
       </categories>
       
@@ -63,7 +88,7 @@
       
       <categories>
           
-          <category> SpringBoot相关学习 </category>
+          <category> SpringBoot </category>
           
       </categories>
       
@@ -88,14 +113,14 @@
       
       <categories>
           
-          <category> SpringBoot相关学习 </category>
+          <category> Spring </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> RabbitMQ </tag>
+            <tag> Spring </tag>
             
         </tags>
       
@@ -113,7 +138,7 @@
       
       <categories>
           
-          <category> Java基础 </category>
+          <category> Java </category>
           
       </categories>
       
@@ -138,7 +163,7 @@
       
       <categories>
           
-          <category> SpringBoot相关学习 </category>
+          <category> RabbitMQ </category>
           
       </categories>
       
@@ -163,7 +188,7 @@
       
       <categories>
           
-          <category> 前端 </category>
+          <category> Vue </category>
           
       </categories>
       
@@ -188,14 +213,14 @@
       
       <categories>
           
-          <category> SpringBoot相关学习 </category>
+          <category> SpringBoot </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> Spring </tag>
+            <tag> SpringBoot </tag>
             
         </tags>
       
@@ -213,7 +238,7 @@
       
       <categories>
           
-          <category> SpringBoot相关学习 </category>
+          <category> Spring </category>
           
       </categories>
       
@@ -238,14 +263,14 @@
       
       <categories>
           
-          <category> SpringBoot相关学习 </category>
+          <category> SpringBoot </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> SpringBoot </tag>
+            <tag> FastJSON </tag>
             
         </tags>
       
@@ -263,7 +288,7 @@
       
       <categories>
           
-          <category> Oracle知识点 </category>
+          <category> Oracle </category>
           
       </categories>
       
@@ -288,7 +313,7 @@
       
       <categories>
           
-          <category> SpringBoot相关学习 </category>
+          <category> SpringBoot </category>
           
       </categories>
       
@@ -313,7 +338,7 @@
       
       <categories>
           
-          <category> Git配置 </category>
+          <category> Git </category>
           
       </categories>
       
@@ -338,7 +363,7 @@
       
       <categories>
           
-          <category> Hexo博客搭建及优化 </category>
+          <category> Hexo </category>
           
       </categories>
       
@@ -363,14 +388,14 @@
       
       <categories>
           
-          <category> tensorflow学习 </category>
+          <category> Tensorflow </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> tensorflow </tag>
+            <tag> Tensorflow </tag>
             
         </tags>
       
@@ -388,7 +413,7 @@
       
       <categories>
           
-          <category> Python学习笔记 </category>
+          <category> Python </category>
           
       </categories>
       
@@ -413,7 +438,7 @@
       
       <categories>
           
-          <category> Hexo博客搭建及优化 </category>
+          <category> Hexo </category>
           
       </categories>
       
@@ -438,7 +463,7 @@
       
       <categories>
           
-          <category> Hexo博客搭建及优化 </category>
+          <category> Hexo </category>
           
       </categories>
       
@@ -463,7 +488,7 @@
       
       <categories>
           
-          <category> Hexo博客搭建及优化 </category>
+          <category> Hexo </category>
           
       </categories>
       
