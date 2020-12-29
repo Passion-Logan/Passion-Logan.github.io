@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="tensorflow基础, Cody_&#39;s Blog">
+    <meta name="keywords" content="Mysql同时使用分页和排序数据重复丢失问题, Cody_&#39;s Blog">
     <meta name="description" content="">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>tensorflow基础 | Cody_&#39;s Blog</title>
+    <title>Mysql同时使用分页和排序数据重复丢失问题 | Cody_&#39;s Blog</title>
     <link rel="icon" type="image/png" href="/favicon2.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -308,12 +308,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/21.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/20.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">tensorflow基础</h1>
+                    <h1 class="description center-align post-title">Mysql同时使用分页和排序数据重复丢失问题</h1>
                 </div>
             </div>
         </div>
@@ -430,8 +430,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Tensorflow/">
-                                <span class="chip bg-color">Tensorflow</span>
+                            <a href="/tags/Mysql/">
+                                <span class="chip bg-color">Mysql</span>
                             </a>
                         
                     </div>
@@ -442,8 +442,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Tensorflow/" class="post-category">
-                                Tensorflow
+                            <a href="/categories/Mysql/" class="post-category">
+                                Mysql
                             </a>
                         
                     </div>
@@ -455,7 +455,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2018-02-24
+                    2020-12-17
                 </div>
                 
 
@@ -464,14 +464,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    403
+                    1.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    5 分
                 </div>
                 
 
@@ -486,37 +486,184 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>简介：<br>tensorflow是一个依赖于python的开源软件库，主要用于<code>数值计算</code>。节点(Node)在图中表示数学操作，图中的线(edges)则表示在节点间相互联系的多维数据数组，即张量(tensor)。</p>
-<a id="more"></a>
+                <p>记录一个很常见的MySQL问题，同时使用<code>limit</code>和<code>order by</code>可能造成数据查询重复和数据丢失问题。我这里测试的MySQL版本号是<code>5.7.20</code></p>
+<p>先来看看表结构：</p>
+<table>
+<thead>
+<tr>
+<th align="center">id(int)</th>
+<th align="center">name(varchar)</th>
+<th align="center">sort(int)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td align="center">测试1</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">测试2</td>
+<td align="center">2</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="center">测试3</td>
+<td align="center">1</td>
+</tr>
+</tbody></table>
+<p>以此类推自行添加测试数据…sort必须要有重复的值，并且sort字段没有索引</p>
+<h3 id="问题重现"><a href="#问题重现" class="headerlink" title="问题重现"></a>问题重现</h3><p>先看带上<code>sort</code>的查询：    </p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select * from test order by sort;
++----+----------+------+
+| id | name     | sort |
++----+----------+------+
+|  1 | 测试1    |    1 |
+|  4 | 测试4    |    1 |
+|  5 | 测试5    |    1 |
+|  7 | 测试7    |    1 |
+|  8 | 测试8    |    1 |
+|  9 | 测试9    |    1 |
+| 10 | 测试10   |    1 |
+| 12 | 测试12   |    1 |
+| 13 | 测试13   |    1 |
+| 14 | 测试14   |    1 |
+| 15 | 测试15   |    1 |
+| 16 | 测试16   |    1 |
+| 17 | 测试17   |    1 |
+| 18 | 测试18   |    1 |
+| 19 | 测试19   |    1 |
+| 20 | 测试20   |    1 |
+|  2 | 测试2    |    2 |
+|  3 | 测试3    |    2 |
+|  6 | 测试6    |    2 |
+| 11 | 测试11   |    2 |
++----+----------+------+</code></pre>
+<p>再来带上<code>limit</code>执行的数据</p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select * from test order by sort limit 0, 2;
++----+----------+------+
+| id | name     | sort |
++----+----------+------+
+|  1 | 测试1    |    1 |
+| 20 | 测试20   |    1 |
++----+----------+------+
 
-<p><code>温馨提示：浏览链接的时候记得上飞机哟。</code></p>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>这里是在windows系统中安装的，对于其他系统就不多做阐述了，按照官方文档来就好了。</p>
-<h3 id="windows系统中安装tensorflow"><a href="#windows系统中安装tensorflow" class="headerlink" title="windows系统中安装tensorflow"></a>windows系统中安装tensorflow</h3><p><a href="https://www.tensorflow.org/install/install_windows" target="_blank" rel="noopener">windows中安装</a><br>在<code>cmd</code>下：</p>
-<pre><code>//选择安装，输入后等待完成
-pip3 install --upgrade tensorflow    安装纯CPU版本
-pip3 install --upgrade tensorflow-gpu    安装GPU版本</code></pre>
-<h3 id="在Ubuntu中安装tensorflow"><a href="#在Ubuntu中安装tensorflow" class="headerlink" title="在Ubuntu中安装tensorflow"></a>在Ubuntu中安装tensorflow</h3><p>按照官方文档来进行安装就好，<a href="https://www.tensorflow.org/install/install_linux" target="_blank" rel="noopener">戳进来</a>。</p>
-<h3 id="在macOS中安装tensorflow"><a href="#在macOS中安装tensorflow" class="headerlink" title="在macOS中安装tensorflow"></a>在macOS中安装tensorflow</h3><p>按照官方文档来进行安装就好，<a href="https://www.tensorflow.org/install/install_mac" target="_blank" rel="noopener">戳进来</a>。</p>
-<h3 id="从源安装tensorflow"><a href="#从源安装tensorflow" class="headerlink" title="从源安装tensorflow"></a>从源安装tensorflow</h3><p>按照官方文档来进行安装就好，<a href="https://www.tensorflow.org/install/install_sources" target="_blank" rel="noopener">戳进来</a>。</p>
-<h2 id="验证安装"><a href="#验证安装" class="headerlink" title="验证安装"></a>验证安装</h2><p>从shell中调用python，如下所示：</p>
-<pre><code>$ python</code></pre>
-<p>在python交互式shell中输入以下短程序：</p>
-<pre><code>&gt;&gt;&gt; import tensorflow as tf
-&gt;&gt;&gt; hello = tf.constant(&#39;Hello, TensorFlow!&#39;)
-&gt;&gt;&gt; sess = tf.Session()
-&gt;&gt;&gt; print(sess.run(hello))</code></pre>
-<p>如果系统输出以下内容，就已经安装成功了。准备开始编写TensorFlow程序：</p>
-<pre><code>hello，TensorFlow！</code></pre>
-<p>如果在sess = tf.Session()之后出现</p>
-<pre><code>2018-02-20 15:20:42.753348: I C:\tf_jenkins\workspace\rel-win\M\windows\PY\36\tensorflow\core\platform\cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX AVX2</code></pre>
-<p>不用管它，这个一个表示成功的信息。</p>
-<script type="text/javascript">
-    //防复制 防右键
-    document.oncontextmenu=new Function("event.returnValue=false;");
-    document.onselectstart=new Function("event.returnValue=false;");
-    //防止注入frame
-    if (top.location != self.location)top.location=self.location;
-</script>
+mysql> select * from test order by sort limit 2, 2;
++----+---------+------+
+| id | name    | sort |
++----+---------+------+
+|  7 | 测试7   |    1 |
+|  4 | 测试4   |    1 |
++----+---------+------+
+
+mysql> select * from test order by sort limit 4, 2;
++----+---------+------+
+| id | name    | sort |
++----+---------+------+
+|  5 | 测试5   |    1 |
+|  8 | 测试8   |    1 |
++----+---------+------+
+
+mysql> select * from test order by sort limit 6, 2;
++----+---------+------+
+| id | name    | sort |
++----+---------+------+
+|  7 | 测试7   |    1 |
+|  8 | 测试8   |    1 |
++----+---------+------+
+
+mysql> select * from test order by sort limit 8, 2;
++----+----------+------+
+| id | name     | sort |
++----+----------+------+
+|  9 | 测试9    |    1 |
+| 10 | 测试10   |    1 |
++----+----------+------+
+
+mysql> select * from test order by sort limit 10, 2;
++----+----------+------+
+| id | name     | sort |
++----+----------+------+
+| 14 | 测试14   |    1 |
+| 12 | 测试12   |    1 |
++----+----------+------+
+
+mysql> select * from test order by sort limit 12, 2;
++----+----------+------+
+| id | name     | sort |
++----+----------+------+
+| 13 | 测试13   |    1 |
+| 14 | 测试14   |    1 |
++----+----------+------+
+</code></pre>
+<p>可以很明显的看到查询后的数据顺序和理想中的不一样，造成了数据顺序错乱和数据丢失问题。</p>
+<h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><p>这个问题在<code>5.6</code>以后的版本都会有，严格的说这并不算一个问题，MySQL官方对<code>order by limit</code>做了个小优化，就是在<code>排序字段无索引并且列值不唯一</code>时，会使用<code>priority queue(优先队列)</code></p>
+<p>这个优先队列的本质和Java中的堆一样的，可以根据limit的条数维护一个堆。</p>
+<p><a href="https://dev.mysql.com/doc/refman/5.7/en/limit-optimization.html" target="_blank" rel="noopener">官方文档</a>也对此做了解释：</p>
+<p>If you combine <code>LIMIT *</code>row_count<code>*</code> with <code>ORDER BY</code>, MySQL stops sorting as soon as it has found the first <em><code>row_count</code></em> rows of the sorted result, rather than sorting the entire result. If ordering is done by using an index, this is very fast. If a filesort must be done, all rows that match the query without the <code>LIMIT</code> clause are selected, and most or all of them are sorted, before the first <em><code>row_count</code></em> are found. After the initial rows have been found, MySQL does not sort any remainder of the result set.</p>
+<p>One manifestation of this behavior is that an <code>ORDER BY</code> query with and without <code>LIMIT</code> may return rows in different order, as described later in this section.</p>
+<p><code>如果将LIMIT row_count与ORDER BY结合使用，MySQL会在找到排序结果的前row_count行后立即停止排序，而不是对整个结果进行排序。 如果通过使用索引进行排序，这将非常快。 如果必须执行文件排序，则在找到第一个row_count之前，将选择所有与查询匹配的，没有LIMIT子句的行，并对其中的大多数或全部进行排序。 找到初始行后，MySQL不会对结果集的其余部分进行排序。此行为的一种体现是，带有和不带有LIMIT的ORDER BY查询可能以不同的顺序返回行，如本节后面所述。</code></p>
+<p>If multiple rows have identical values in the ORDER BY columns, the server is free to return those rows in any order, and may do so differently depending on the overall execution plan. In other words, the sort order of those rows is nondeterministic with respect to the nonordered columns.</p>
+<p><code>如果多个行在ORDER BY列中具有相同的值，则服务器可以自由以任何顺序返回这些行，并且根据整体执行计划的不同，返回值可以不同。 换句话说，这些行的排序顺序相对于无序列是不确定的。</code></p>
+<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><ol>
+<li>添加一个唯一的字段，比如id(最优解)</li>
+<li>给排序字段添加索引</li>
+</ol>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select * from test order by sort,id limit 0, 2;
++----+---------+------+
+| id | name    | sort |
++----+---------+------+
+|  1 | 测试1   |    1 |
+|  4 | 测试4   |    1 |
++----+---------+------+
+
+mysql> select * from test order by sort,id limit 2, 2;
++----+---------+------+
+| id | name    | sort |
++----+---------+------+
+|  5 | 测试5   |    1 |
+|  7 | 测试7   |    1 |
++----+---------+------+
+
+mysql> select * from test order by sort,id limit 4, 2;
++----+---------+------+
+| id | name    | sort |
++----+---------+------+
+|  8 | 测试8   |    1 |
+|  9 | 测试9   |    1 |
++----+---------+------+
+
+mysql> select * from test order by sort,id limit 6, 2;
++----+----------+------+
+| id | name     | sort |
++----+----------+------+
+| 10 | 测试10   |    1 |
+| 12 | 测试12   |    1 |
++----+----------+------+
+
+mysql> select * from test order by sort,id limit 8, 2;
++----+----------+------+
+| id | name     | sort |
++----+----------+------+
+| 13 | 测试13   |    1 |
+| 14 | 测试14   |    1 |
++----+----------+------+
+
+mysql> select * from test order by sort,id limit 10, 2;
++----+----------+------+
+| id | name     | sort |
++----+----------+------+
+| 15 | 测试15   |    1 |
+| 16 | 测试16   |    1 |
++----+----------+------+
+
+mysql> select * from test order by sort,id limit 12, 2;
++----+----------+------+
+| id | name     | sort |
++----+----------+------+
+| 17 | 测试17   |    1 |
+| 18 | 测试18   |    1 |
++----+----------+------+</code></pre>
 
             </div>
             <hr/>
@@ -542,7 +689,7 @@ pip3 install --upgrade tensorflow-gpu    安装GPU版本</code></pre>
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://www.wangqilong.net/2018/02/24/tensorflow-ji-chu/">https://www.wangqilong.net/2018/02/24/tensorflow-ji-chu/</a>
+                    <a href="https://www.wangqilong.net/2020/12/17/mysql-tong-shi-shi-yong-fen-ye-he-pai-xu-shu-ju-diu-shi-wen-ti/">https://www.wangqilong.net/2020/12/17/mysql-tong-shi-shi-yong-fen-ye-he-pai-xu-shu-ju-diu-shi-wen-ti/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -580,8 +727,8 @@ pip3 install --upgrade tensorflow-gpu    安装GPU版本</code></pre>
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Tensorflow/">
-                                    <span class="chip bg-color">Tensorflow</span>
+                                <a href="/tags/Mysql/">
+                                    <span class="chip bg-color">Mysql</span>
                                 </a>
                             
                         </div>
@@ -890,34 +1037,32 @@ pip3 install --upgrade tensorflow-gpu    安装GPU版本</code></pre>
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2018/02/26/xiu-gai-hexo-bo-ke-shang-chuan-xie-yi-wei-ssh/">
+                <a href="/2020/12/26/elasticsear-shu-ju-lei-xing/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="修改Hexo博客上传协议为SSH">
+                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="Elasticsearch数据类型">
                         
-                        <span class="card-title">修改Hexo博客上传协议为SSH</span>
+                        <span class="card-title">Elasticsearch数据类型</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            在使用过Hexo博客一段时间过后，它突然报了一个错误，让我摸不着头脑，错误如下：
-......
-FATAL bash: /dev/tty: No such device or address
-error: failed to execute
+                            随着版本的改动，小部分数据类型也有细微的改动，就比如string类型新版本就不再支持。我本地的版本是7.9.3文档版本是7.X
+1 常见类型1.1 binary - 二进制型二进制值编码为Base64字符串, 不以默认的方式存储, 不能被搜
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2018-02-26
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-12-26
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Hexo/" class="post-category">
-                                    Hexo
+                            <a href="/categories/Elasticsearch/" class="post-category">
+                                    Elasticsearch
                                 </a>
                             
                             
@@ -927,8 +1072,8 @@ error: failed to execute
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Hexo/">
-                        <span class="chip bg-color">Hexo</span>
+                    <a href="/tags/Elasticsearch/">
+                        <span class="chip bg-color">Elasticsearch</span>
                     </a>
                     
                 </div>
@@ -942,37 +1087,35 @@ error: failed to execute
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2018/02/24/python-duan-lu-ji-suan/">
+                <a href="/2020/12/12/docker-zhong-an-zhuang-elasticsearch/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="Python--短路计算">
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="Docker中安装Elasticsearch">
                         
-                        <span class="card-title">Python--短路计算</span>
+                        <span class="card-title">Docker中安装Elasticsearch</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            一个很小的细节，可是却可以在你不注意的时候给你带来炒鸡大的麻烦！放在这里时刻提醒自己这个小坑：
-
-
-例：
-a = True
-print(a and &#39;a=T&#39; or &#39;a=F&#39;)    //最后结果：a=T
-
+                            Docker给开发人员带来了极大的便利性；舍弃那些安装包和配置环境，拾起docker pull一把梭哈。
+本文涉及到的所有版本号都是7.9.3
+Docker镜像地址
+安装Elasticsearch拉取镜像命令
+docker pull ela
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2018-02-24
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-12-12
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Python/" class="post-category">
-                                    Python
+                            <a href="/categories/Docker/" class="post-category">
+                                    Docker
                                 </a>
                             
                             
@@ -982,8 +1125,8 @@ print(a and &#39;a=T&#39; or &#39;a=F&#39;)    //最后结果：a=T
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Python/">
-                        <span class="chip bg-color">Python</span>
+                    <a href="/tags/Elasticsearch/">
+                        <span class="chip bg-color">Elasticsearch</span>
                     </a>
                     
                 </div>
