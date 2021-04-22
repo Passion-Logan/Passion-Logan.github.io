@@ -503,7 +503,8 @@ fatal: could not read Username for &#39;https://github.com&#39;: Invalid argumen
 <h2 id="生成ssh-key"><a href="#生成ssh-key" class="headerlink" title="生成ssh key"></a>生成ssh key</h2><p>在你的GitBash中键入:</p>
 <pre><code>$ ssh-keygen -t rsa -C ********@qq.com(换成你使用的邮箱地址)</code></pre>
 <p>之后的都可以回车跳过，完成后会在你C盘的用户目录下生成一个id_rsa的公钥，具体路径看命令行中的<code>Your identification has been saved in *****</code>。</p>
-<h2 id="配置Github账户的ssh-key"><a href="#配置Github账户的ssh-key" class="headerlink" title="配置Github账户的ssh key"></a>配置Github账户的ssh key</h2><p>打开id_rsa.pub文件，将一整串公钥copy下来。<br>进入你GitHub账户的设置，在ssh key中点击<code>New SSH key</code>,<br><img src="/images/%E4%BF%AE%E6%94%B9Hexo%E5%8D%9A%E5%AE%A2%E4%B8%8A%E4%BC%A0%E5%8D%8F%E8%AE%AE%E4%B8%BASSH/1.png"><br>把刚刚copy出来的公钥粘贴到Key中，title放空就好<br><img src="/images/%E4%BF%AE%E6%94%B9Hexo%E5%8D%9A%E5%AE%A2%E4%B8%8A%E4%BC%A0%E5%8D%8F%E8%AE%AE%E4%B8%BASSH/2.png"></p>
+<h2 id="配置Github账户的ssh-key"><a href="#配置Github账户的ssh-key" class="headerlink" title="配置Github账户的ssh key"></a>配置Github账户的ssh key</h2><p>打开id_rsa.pub文件，将一整串公钥copy下来。<br>进入你GitHub账户的设置，在ssh key中点击<code>New SSH key</code>,</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/20210422/1.14r87krsm5fg.png" alt="1"><br>把刚刚copy出来的公钥粘贴到Key中，title放空就好<br><img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/20210422/2.4cajlps7ft40.png" alt="2"></p>
 <h2 id="验证ssh-key"><a href="#验证ssh-key" class="headerlink" title="验证ssh key"></a>验证ssh key</h2><p>在GitBash中键入：</p>
 <pre><code>$ ssh -T git@github.com</code></pre>
 <p>若出现下面语句就说明你成功了！</p>
@@ -1130,7 +1131,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">33.3k</span>&nbsp;字
+                class="white-color">37.2k</span>&nbsp;字
             
             
             

@@ -503,7 +503,7 @@
 <p>-p：指定端口映射，格式为：<strong>主机(宿主)端口:容器端口</strong></p>
 <p>最后带上镜像id或者名称，成功后会返回容器id</p>
 <p>浏览器地址中输入<code>http://localhost:9200/?pretty</code>验证是否安装成功,出现下图则表示安装成功。</p>
-<p><img src="/images/Docker%E4%B8%AD%E5%AE%89%E8%A3%85Elasticsearch/1.png" alt="es安装验证"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/20210422/1.4egbx3ojjl60.png" alt="1"></p>
 <h3 id="Elasticsearch安装ik分词器"><a href="#Elasticsearch安装ik分词器" class="headerlink" title="Elasticsearch安装ik分词器"></a>Elasticsearch安装ik分词器</h3><p>分词器版本应和es版本对应 <a href="https://github.com/medcl/elasticsearch-analysis-ik/releases" target="_blank" rel="noopener">ik分词器地址</a></p>
 <p>这里我们采用在线安装的方法简单一些，不用去下载到本地再扔到相应的文件中。</p>
 <pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 我们使用的是Docker for windows 切换到linux模式，右键 Switch to linux containers... </span>
@@ -512,9 +512,9 @@ docker <span class="token function">exec</span> -it elasticsearch /bin/bash 或�
 <span class="token comment" spellcheck="true"># 安装命令</span>
 ./bin/elasticsearch-plugin <span class="token function">install</span>  https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.9.3/elasticsearch-analysis-ik-7.9.3.zip
 </code></pre>
-<p><img src="/images/Docker%E4%B8%AD%E5%AE%89%E8%A3%85Elasticsearch/3.png" alt="安装成功"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/20210422/3.6txzwz02oy80.png" alt="3"></p>
 <p>安装成功后编辑<code>plugin-descriptor.properties</code>文件，查看文件末尾是否有版本号<code>elasticsearch.version=7.9.3</code>没有就加上</p>
-<p><img src="/images/Docker%E4%B8%AD%E5%AE%89%E8%A3%85Elasticsearch/4.png" alt="plugin-descriptor.properties"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/20210422/4.5wd5kzly5p80.png" alt="4"></p>
 <h3 id="安装Kibana"><a href="#安装Kibana" class="headerlink" title="安装Kibana"></a>安装Kibana</h3><p>拉取镜像命令</p>
 <pre class=" language-bash"><code class="language-bash">docker pull kibana:7.9.3</code></pre>
 <h3 id="创建Kibana容器并运行"><a href="#创建Kibana容器并运行" class="headerlink" title="创建Kibana容器并运行"></a>创建Kibana容器并运行</h3><pre class=" language-bash"><code class="language-bash">docker run -d -p 5601:5601 --name kibana --link elasticsearch -e <span class="token string">"ELASTICSEARCH_URL=http://本机ip地址:9200"</span> f9f7fac59a10</code></pre>
@@ -528,7 +528,7 @@ docker <span class="token function">exec</span> -it elasticsearch /bin/bash 或�
 i18n.locale: <span class="token string">"zh-CN"</span>
 <span class="token comment" spellcheck="true"># 保存退出重启容器即可</span></code></pre>
 <p>浏览器中输入地址<code>http://localhost:5601</code>，进入后即可。可以在Kibana控制台中输入命令查看集群健康状态等：</p>
-<p><img src="/images/Docker%E4%B8%AD%E5%AE%89%E8%A3%85Elasticsearch/2.png" alt="集群健康状态"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/20210422/2.646j5zishco.png" alt="2"></p>
 <p>最后附上两个Elasticsearch文档地址</p>
 <p><a href="https://www.elastic.co/guide/cn/elasticsearch/guide/current/index.html" target="_blank" rel="noopener">Elasticsearch中文文档1</a></p>
 <p><a href="https://learnku.com/docs/elasticsearch73/7.3" target="_blank" rel="noopener">Elasticsearch中文文档2</a></p>
@@ -939,8 +939,8 @@ sort(int)
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Mysql/" class="post-category">
-                                    Mysql
+                            <a href="/categories/MySQL/" class="post-category">
+                                    MySQL
                                 </a>
                             
                             
@@ -950,8 +950,8 @@ sort(int)
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Mysql/">
-                        <span class="chip bg-color">Mysql</span>
+                    <a href="/tags/MySQL/">
+                        <span class="chip bg-color">MySQL</span>
                     </a>
                     
                 </div>
@@ -1160,7 +1160,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">33.3k</span>&nbsp;字
+                class="white-color">37.2k</span>&nbsp;字
             
             
             

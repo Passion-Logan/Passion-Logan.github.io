@@ -487,7 +487,7 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h4 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h4><p>队列服务，一般涉及到三个概念：生产者、队列、消费者；RabbitMQ在生产者和队列之间加入了<code>交换器(Exchange)</code>便于交互；避免生产者与队列的直接交互，而是生产者发送消息给交换器，交换器根据调度策略给队列。</p>
-<p><img src="/images/RabbitMQ%E5%AD%A6%E4%B9%A0-%E4%B8%80%5C1-1.png" alt="相关概念"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/20210422/1-1.51efzjl66ks0.png" alt="1-1"></p>
 <a id="more"></a>
 
 <ul>
@@ -509,7 +509,7 @@
 <li>Fanout：转发消息到所有绑定队列。</li>
 </ul>
 <h6 id="Direct-Exchange"><a href="#Direct-Exchange" class="headerlink" title="Direct Exchange"></a>Direct Exchange</h6><p>Direct Exchange是RabbitMQ默认的交换机模式，根据key去匹配寻找队列。</p>
-<p><img src="/images/RabbitMQ%E5%AD%A6%E4%B9%A0-%E4%B8%80%5C2.png" alt="Direct Exchage"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/20210422/2.sx69x6vfjr4.png" alt="2"></p>
 <p>如图，X-Q1有一个 routing_key 为 orange；X-Q2有两个 routing_key 为 black、green；Q1接收 orange 的消息，Q2接收 black 和 green 的消息。</p>
 <h6 id="Topic-Exchange"><a href="#Topic-Exchange" class="headerlink" title="Topic Exchange"></a>Topic Exchange</h6><p>转发消息主要根据通配符。这种交换机下，队列和交换机的绑定会定义一种路由模式，通配符在这种路由模式和路由键之间匹配后交换机才能转发消息。</p>
 <p>这种模式下：</p>
@@ -1150,7 +1150,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">33.3k</span>&nbsp;字
+                class="white-color">37.2k</span>&nbsp;字
             
             
             
