@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="修改Hexo博客上传协议为SSH, Cody_&#39;s Blog">
+    <meta name="keywords" content="Go变量逃逸分析, Cody_&#39;s Blog">
     <meta name="description" content="">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>修改Hexo博客上传协议为SSH | Cody_&#39;s Blog</title>
+    <title>Go变量逃逸分析 | Cody_&#39;s Blog</title>
     <link rel="icon" type="image/png" href="/favicon2.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -308,12 +308,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/2.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/22.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">修改Hexo博客上传协议为SSH</h1>
+                    <h1 class="description center-align post-title">Go变量逃逸分析</h1>
                 </div>
             </div>
         </div>
@@ -430,8 +430,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Hexo/">
-                                <span class="chip bg-color">Hexo</span>
+                            <a href="/tags/Go/">
+                                <span class="chip bg-color">Go</span>
                             </a>
                         
                     </div>
@@ -442,8 +442,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Hexo/" class="post-category">
-                                Hexo
+                            <a href="/categories/Go/" class="post-category">
+                                Go
                             </a>
                         
                     </div>
@@ -455,7 +455,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2018-02-26
+                    2021-02-06
                 </div>
                 
 
@@ -464,14 +464,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    519
+                    858
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    2 分
+                    3 分
                 </div>
                 
 
@@ -486,38 +486,81 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>在使用过Hexo博客一段时间过后，它突然报了一个错误，让我摸不着头脑，错误如下：</p>
-<pre><code>......
-FATAL bash: /dev/tty: No such device or address
-error: failed to execute prompt script (exit code 1)
-fatal: could not read Username for &#39;https://github.com&#39;: Invalid argument
-Error: bash: /dev/tty: No such device or address
-error: failed to execute prompt script (exit code 1)
-fatal: could not read Username for &#39;https://github.com&#39;: Invalid argument
-......</code></pre>
-<p>以我初中的英语水平还是大概能看懂这个报错的，就是说不能读取我的用户名的样子。</p>
-<a id="more"></a>
-<p>这个报错是hexo d命令导致的错误，无法部署(当然无法部署了，你是谁都不知道，还部署什么-.-)。</p>
-<p>一番折腾过后，我发现网上有许多类似的问题，不过最后好像都没给出一个具体的原因，说是HTTPS协议问题，可是一开始HTTPS协议也可以使用，总之大部分回答试了过后都无法成功的解决它。最后只有改为SSH协议上传了。</p>
-<p>按照以下步骤正确的修改为SSH协议上传：</p>
-<h2 id="生成ssh-key"><a href="#生成ssh-key" class="headerlink" title="生成ssh key"></a>生成ssh key</h2><p>在你的GitBash中键入:</p>
-<pre><code>$ ssh-keygen -t rsa -C ********@qq.com(换成你使用的邮箱地址)</code></pre>
-<p>之后的都可以回车跳过，完成后会在你C盘的用户目录下生成一个id_rsa的公钥，具体路径看命令行中的<code>Your identification has been saved in *****</code>。</p>
-<h2 id="配置Github账户的ssh-key"><a href="#配置Github账户的ssh-key" class="headerlink" title="配置Github账户的ssh key"></a>配置Github账户的ssh key</h2><p>打开id_rsa.pub文件，将一整串公钥copy下来。<br>进入你GitHub账户的设置，在ssh key中点击<code>New SSH key</code>,</p>
-<p><img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/20210422/1.14r87krsm5fg.png" alt="1"><br>把刚刚copy出来的公钥粘贴到Key中，title放空就好<br><img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/20210422/2.4cajlps7ft40.png" alt="2"></p>
-<h2 id="验证ssh-key"><a href="#验证ssh-key" class="headerlink" title="验证ssh key"></a>验证ssh key</h2><p>在GitBash中键入：</p>
-<pre><code>$ ssh -T git@github.com</code></pre>
-<p>若出现下面语句就说明你成功了！</p>
-<pre><code>Hi Passion-Logan! You&#39;ve successfully authenticated, but GitHub does not provide shell access.</code></pre>
-<h2 id="通过SSH部署到GitHub上"><a href="#通过SSH部署到GitHub上" class="headerlink" title="通过SSH部署到GitHub上"></a>通过SSH部署到GitHub上</h2><p>在你博客根目录打开GitBash，键入：</p>
-<pre><code>$ hexo clean &amp;&amp; hexo g &amp;&amp; hexo d    //不是每次都需要hexo clean，看个人。</code></pre>
-<script type="text/javascript">
-    //防复制 防右键
-    document.oncontextmenu=new Function("event.returnValue=false;");
-    document.onselectstart=new Function("event.returnValue=false;");
-    //防止注入frame
-    if (top.location != self.location)top.location=self.location;
-</script>
+                <h3 id="什么是逃逸分析"><a href="#什么是逃逸分析" class="headerlink" title="什么是逃逸分析"></a>什么是逃逸分析</h3><p>逃逸分析是一种确定指针动态范围的方法——分析在程序的哪些地方可以访问到指针。也就是说通过编译器分析代码的特征和生命周期，决定应该使用堆还是使用栈来进行内存分配。</p>
+<p>常见的两种逃逸情景：</p>
+<ol>
+<li>函数中局部对象指针被返回（不确定被谁访问）</li>
+<li>对象指针被多个子程序（如线程 协程）共享使用</li>
+</ol>
+<p>逃逸分析作用就是优化程序，当函数中生成一个新对象：</p>
+<ol>
+<li>如果分配到栈上，待函数返回资源就被回收了</li>
+<li>如果分配到堆上，函数返回后交给gc来管理该对象资源</li>
+</ol>
+<p>栈资源的分配及回收速度比堆要快，逃逸分析的最大好处就是减少了GC的压力。</p>
+<h4 id="逃逸分析"><a href="#逃逸分析" class="headerlink" title="逃逸分析"></a>逃逸分析</h4><pre class=" language-go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token string">"fmt"</span>
+
+<span class="token keyword">func</span> <span class="token function">dummy</span><span class="token punctuation">(</span>b <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">int</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> c <span class="token builtin">int</span>
+    c <span class="token operator">=</span> b
+    <span class="token keyword">return</span> c
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">void</span><span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token punctuation">{</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> a <span class="token builtin">int</span>
+    <span class="token function">void</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    fmt<span class="token punctuation">.</span><span class="token function">Print</span><span class="token punctuation">(</span>a<span class="token punctuation">,</span> <span class="token function">dummy</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>使用<code>go run -gcflags &quot;-m -l&quot; main.go</code>命令运行代码：</p>
+<ul>
+<li>-gcflags是编译参数</li>
+<li>-m 表示进行内存分配分析</li>
+<li>-l 表示避免程序内联，也就是避免进行程序优化</li>
+</ul>
+<p>运行结果如下：</p>
+<pre class=" language-json"><code class="language-json"># command-line-arguments
+src\basics\main.go<span class="token operator">:</span><span class="token number">18</span><span class="token operator">:</span><span class="token number">11</span><span class="token operator">:</span> ... argument does not escape
+src\basics\main.go<span class="token operator">:</span><span class="token number">18</span><span class="token operator">:</span><span class="token number">11</span><span class="token operator">:</span> a escapes to heap
+src\basics\main.go<span class="token operator">:</span><span class="token number">18</span><span class="token operator">:</span><span class="token number">20</span><span class="token operator">:</span> dummy(<span class="token number">0</span><span class="token punctuation">)</span> escapes to heap
+<span class="token number">0</span> <span class="token number">0</span></code></pre>
+<p>程序运行结果分析如下：</p>
+<ul>
+<li>第2行告知“代码的第18行的变量 a 逃逸到堆”。</li>
+<li>第3行告知“dummy(0) 调用逃逸到堆”。由于 dummy() 函数会返回一个整型值，这个值被 fmt.Println 使用后还是会在 main() 函数中继续存在。</li>
+<li>第4行，这句提示是默认的，可以忽略。</li>
+</ul>
+<p>上面例子中变量 c 是整型，其值通过 dummy() 的返回值“逃出”了 dummy() 函数。变量 c 的值被复制并作为 dummy() 函数的返回值返回，即使变量 c 在 dummy() 函数中分配的内存被释放，也不会影响 main() 中使用 dummy() 返回的值。变量 c 使用栈分配不会影响结果。</p>
+<h4 id="取地址发生逃逸"><a href="#取地址发生逃逸" class="headerlink" title="取地址发生逃逸"></a>取地址发生逃逸</h4><pre class=" language-go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token string">"fmt"</span>
+
+<span class="token comment" spellcheck="true">// 声明空结构体测试结构体逃逸情况</span>
+<span class="token keyword">type</span> Data <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">dummy</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span>Data <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> c Data
+    <span class="token comment" spellcheck="true">//返回函数局部变量地址</span>
+    <span class="token keyword">return</span> <span class="token operator">&amp;</span>c
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token function">dummy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+<p>使用<code>go run -gcflags &quot;-m -l&quot; main.go</code>命令运行代码：</p>
+<pre class=" language-json"><code class="language-json"># command-line-arguments
+src\basics\main.go<span class="token operator">:</span><span class="token number">10</span><span class="token operator">:</span><span class="token number">6</span><span class="token operator">:</span> moved to heap<span class="token operator">:</span> c
+src\basics\main.go<span class="token operator">:</span><span class="token number">16</span><span class="token operator">:</span><span class="token number">13</span><span class="token operator">:</span> ... argument does not escape
+&amp;<span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
+<p>注意第2行出现了新的提示：将 c 移到堆中。这句话表示，Go编译器已经确认如果将变量c分配在栈上是无法保证程序最终结果的，如果这样做，dummy() 函数的返回值将是一个不可预知的内存地址，这种情况一般是 C/C++ 语言中容易犯错的地方，引用了一个函数局部变量的地址。</p>
+<p>Go语言最终选择将 c 的 Data 结构分配在堆上。然后由垃圾回收器去回收 c 的内存。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>逃逸分析是编译器在静态编译的时候，分析对象的生命周期及引用情况来决定对象内存分配到堆上还是栈上，由于栈内存分配较堆快且栈内存回收较快（无需gc），编译器以此来优化程序性能。</p>
 
             </div>
             <hr/>
@@ -543,7 +586,7 @@ fatal: could not read Username for &#39;https://github.com&#39;: Invalid argumen
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://www.wangqilong.net/2018/02/26/xiu-gai-hexo-bo-ke-shang-chuan-xie-yi-wei-ssh/">https://www.wangqilong.net/2018/02/26/xiu-gai-hexo-bo-ke-shang-chuan-xie-yi-wei-ssh/</a>
+                    <a href="https://www.wangqilong.net/2021/02/06/go-bian-liang-tao-yi-fen-xi/">https://www.wangqilong.net/2021/02/06/go-bian-liang-tao-yi-fen-xi/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -581,8 +624,8 @@ fatal: could not read Username for &#39;https://github.com&#39;: Invalid argumen
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Hexo/">
-                                    <span class="chip bg-color">Hexo</span>
+                                <a href="/tags/Go/">
+                                    <span class="chip bg-color">Go</span>
                                 </a>
                             
                         </div>
@@ -887,46 +930,51 @@ fatal: could not read Username for &#39;https://github.com&#39;: Invalid argumen
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2018/03/06/git-tian-jia-duo-ge-ssh-mi-yao-yi-ji-yuan-cheng-cang-ku/">
+                <a href="/2021/02/06/go-bian-liang-tao-yi-fen-xi/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="Git添加多个SSH密钥以及远程仓库">
+                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="Go变量逃逸分析">
                         
-                        <span class="card-title">Git添加多个SSH密钥以及远程仓库</span>
+                        <span class="card-title">Go变量逃逸分析</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            使用过GitHub的小伙伴们都知道，GitHub创建私有仓库是收费的，对于一些不能公开的代码是没有办法在GitHub上进行备份的。这里我推介一个国内的代码托管网站——码云,它是一款国内的基于Git的研发协作平台，它是免费创建私有仓库的。操作
+                            什么是逃逸分析逃逸分析是一种确定指针动态范围的方法——分析在程序的哪些地方可以访问到指针。也就是说通过编译器分析代码的特征和生命周期，决定应该使用堆还是使用栈来进行内存分配。
+常见的两种逃逸情景：
+
+函数中局部对象指针被返回（不确定被谁访问
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2018-03-06
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-02-06
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Git/" class="post-category">
-                                    Git
+                            <a href="/categories/Go/" class="post-category">
+                                    Go
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Git/">
-                        <span class="chip bg-color">Git</span>
+                    <a href="/tags/Go/">
+                        <span class="chip bg-color">Go</span>
                     </a>
                     
                 </div>
@@ -940,34 +988,34 @@ fatal: could not read Username for &#39;https://github.com&#39;: Invalid argumen
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2018/02/24/tensorflow-ji-chu/">
+                <a href="/2021/01/28/mysql-de-shi-wu-ri-zhi/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="tensorflow基础">
+                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="MySQL的事务日志">
                         
-                        <span class="card-title">tensorflow基础</span>
+                        <span class="card-title">MySQL的事务日志</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            简介：tensorflow是一个依赖于python的开源软件库，主要用于数值计算。节点(Node)在图中表示数学操作，图中的线(edges)则表示在节点间相互联系的多维数据数组，即张量(tensor)。
+                            MySQL的日志主要有三种：binlog(二进制日志)，redo log(重做日志)，undo log(回滚日志)
 
-
-温馨提示：浏览链接的时候记得上飞
+redo log 是物理日志，undo log 和 binlog 是逻辑日志
+binlog二进制日志是server层的无论
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2018-02-24
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-01-28
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Tensorflow/" class="post-category">
-                                    Tensorflow
+                            <a href="/categories/MySQL/" class="post-category">
+                                    MySQL
                                 </a>
                             
                             
@@ -977,8 +1025,8 @@ fatal: could not read Username for &#39;https://github.com&#39;: Invalid argumen
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Tensorflow/">
-                        <span class="chip bg-color">Tensorflow</span>
+                    <a href="/tags/MySQL/">
+                        <span class="chip bg-color">MySQL</span>
                     </a>
                     
                 </div>
