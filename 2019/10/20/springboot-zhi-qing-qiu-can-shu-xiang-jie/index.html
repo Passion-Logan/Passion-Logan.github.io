@@ -530,8 +530,7 @@
 <span class="token annotation punctuation">@RequestMapping</span><span class="token punctuation">(</span>value <span class="token operator">=</span> <span class="token string">"/helloWorld"</span><span class="token punctuation">)</span>
 <span class="token keyword">public</span> String <span class="token function">helloWorld</span><span class="token punctuation">(</span><span class="token annotation punctuation">@ModelAttribute</span> User user<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token keyword">return</span> <span class="token string">"helloWorld"</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-</code></pre>
+<span class="token punctuation">}</span></code></pre>
 </li>
 <li><p>使用@RequestParam绑定请求参数到方法入参</p>
 <pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// 当请求参数username不存在时会有异常发生,可以通过设置属性required=false解决,例如: @RequestParam(value="username", required=false)</span>
