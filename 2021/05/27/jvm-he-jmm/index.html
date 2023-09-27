@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="@Autowired注解自动注入的原理, Cody_&#39;s Blog">
+    <meta name="keywords" content="JVM和JMM, Cody_&#39;s Blog">
     <meta name="description" content="">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>@Autowired注解自动注入的原理 | Cody_&#39;s Blog</title>
+    <title>JVM和JMM | Cody_&#39;s Blog</title>
     <link rel="icon" type="image/png" href="/favicon2.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -308,12 +308,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/5.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/7.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">@Autowired注解自动注入的原理</h1>
+                    <h1 class="description center-align post-title">JVM和JMM</h1>
                 </div>
             </div>
         </div>
@@ -430,8 +430,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Spring/">
-                                <span class="chip bg-color">Spring</span>
+                            <a href="/tags/Java/">
+                                <span class="chip bg-color">Java</span>
                             </a>
                         
                     </div>
@@ -442,8 +442,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Spring/" class="post-category">
-                                Spring
+                            <a href="/categories/Java/" class="post-category">
+                                Java
                             </a>
                         
                     </div>
@@ -455,7 +455,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-01-15
+                    2021-05-27
                 </div>
                 
 
@@ -464,14 +464,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    646
+                    6.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    3 分
+                    23 分
                 </div>
                 
 
@@ -486,105 +486,166 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>@Autowired自动注入是由<code>AutowiredAnnotationBeanPostProcessor</code>实现的，这个类实现了<code>MergedBeanDefinitionPostProcessor</code>接口，进而实现了<code>postProcessMergedBeanDefinition</code>方法，@Autowired注解正是通过这个方法实现注入类型的预解析，将需要依赖注入的属性信息封装到<code>InjectionMetadata</code>类中，InjectionMetadata类中包含了哪些需要注入的元素及元素要注入到哪个目标类中，在Spring容器启动的过程中初始化单例bean的时候通过populateBean方法实现对属性的注入。</p>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">AutowiredAnnotationBeanPostProcessor</span> <span class="token keyword">extends</span> <span class="token class-name">InstantiationAwareBeanPostProcessorAdapter</span> <span class="token keyword">implements</span> <span class="token class-name">MergedBeanDefinitionPostProcessor</span><span class="token punctuation">,</span> PriorityOrdered<span class="token punctuation">,</span> BeanFactoryAware <span class="token punctuation">{</span>
-    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">postProcessMergedBeanDefinition</span><span class="token punctuation">(</span>RootBeanDefinition beanDefinition<span class="token punctuation">,</span> Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> beanType<span class="token punctuation">,</span> String beanName<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        InjectionMetadata metadata <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">findAutowiringMetadata</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> beanType<span class="token punctuation">,</span> <span class="token punctuation">(</span>PropertyValues<span class="token punctuation">)</span>null<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        metadata<span class="token punctuation">.</span><span class="token function">checkConfigMembers</span><span class="token punctuation">(</span>beanDefinition<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span></code></pre>
-<p>自动注入的核心方法<code>buildAutowiringMetadata</code>：</p>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">private</span> InjectionMetadata <span class="token function">buildAutowiringMetadata</span><span class="token punctuation">(</span>Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> clazz<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    List<span class="token operator">&lt;</span>InjectedElement<span class="token operator">></span> elements <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment" spellcheck="true">//需要处理的目标类</span>
-    Class <span class="token class-name">targetClass</span> <span class="token operator">=</span> clazz<span class="token punctuation">;</span>
-
-    <span class="token keyword">do</span> <span class="token punctuation">{</span>
-        List<span class="token operator">&lt;</span>InjectedElement<span class="token operator">></span> currElements <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">/*通过反射获取该类所有的字段，并遍历每一个字段，并通过方法findAutowiredAnnotation遍历每一个字段的所用注解，并如果用autowired修饰了，则返回auotowired相关属性*/</span>
-        ReflectionUtils<span class="token punctuation">.</span><span class="token function">doWithLocalFields</span><span class="token punctuation">(</span>targetClass<span class="token punctuation">,</span> <span class="token punctuation">(</span>field<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">{</span>
-            AnnotationAttributes ann <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">findAutowiredAnnotation</span><span class="token punctuation">(</span>field<span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token comment" spellcheck="true">//校验autowired注解是否用在了static方法上</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span>ann <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                <span class="token keyword">if</span> <span class="token punctuation">(</span>Modifier<span class="token punctuation">.</span><span class="token function">isStatic</span><span class="token punctuation">(</span>field<span class="token punctuation">.</span><span class="token function">getModifiers</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>logger<span class="token punctuation">.</span><span class="token function">isInfoEnabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        <span class="token keyword">this</span><span class="token punctuation">.</span>logger<span class="token punctuation">.</span><span class="token function">info</span><span class="token punctuation">(</span><span class="token string">"Autowired annotation is not supported on static fields: "</span> <span class="token operator">+</span> field<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-
-                    <span class="token keyword">return</span><span class="token punctuation">;</span>
-                <span class="token punctuation">}</span>
-                <span class="token comment" spellcheck="true">//判断是否指定了required</span>
-                <span class="token keyword">boolean</span> required <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">determineRequiredStatus</span><span class="token punctuation">(</span>ann<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                currElements<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">AutowiredAnnotationBeanPostProcessor<span class="token punctuation">.</span>AutowiredFieldElement</span><span class="token punctuation">(</span>field<span class="token punctuation">,</span> required<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-
-        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//通过反射处理类的method</span>
-        ReflectionUtils<span class="token punctuation">.</span><span class="token function">doWithLocalMethods</span><span class="token punctuation">(</span>targetClass<span class="token punctuation">,</span> <span class="token punctuation">(</span>method<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">{</span>
-            Method bridgedMethod <span class="token operator">=</span> BridgeMethodResolver<span class="token punctuation">.</span><span class="token function">findBridgedMethod</span><span class="token punctuation">(</span>method<span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span>BridgeMethodResolver<span class="token punctuation">.</span><span class="token function">isVisibilityBridgeMethodPair</span><span class="token punctuation">(</span>method<span class="token punctuation">,</span> bridgedMethod<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                AnnotationAttributes ann <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">findAutowiredAnnotation</span><span class="token punctuation">(</span>bridgedMethod<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token keyword">if</span> <span class="token punctuation">(</span>ann <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> method<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>ClassUtils<span class="token punctuation">.</span><span class="token function">getMostSpecificMethod</span><span class="token punctuation">(</span>method<span class="token punctuation">,</span> clazz<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                    <span class="token keyword">if</span> <span class="token punctuation">(</span>Modifier<span class="token punctuation">.</span><span class="token function">isStatic</span><span class="token punctuation">(</span>method<span class="token punctuation">.</span><span class="token function">getModifiers</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>logger<span class="token punctuation">.</span><span class="token function">isInfoEnabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                            <span class="token keyword">this</span><span class="token punctuation">.</span>logger<span class="token punctuation">.</span><span class="token function">info</span><span class="token punctuation">(</span><span class="token string">"Autowired annotation is not supported on static methods: "</span> <span class="token operator">+</span> method<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                        <span class="token punctuation">}</span>
-
-                        <span class="token keyword">return</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-
-                    <span class="token keyword">if</span> <span class="token punctuation">(</span>method<span class="token punctuation">.</span><span class="token function">getParameterCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">this</span><span class="token punctuation">.</span>logger<span class="token punctuation">.</span><span class="token function">isInfoEnabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                        <span class="token keyword">this</span><span class="token punctuation">.</span>logger<span class="token punctuation">.</span><span class="token function">info</span><span class="token punctuation">(</span><span class="token string">"Autowired annotation should only be used on methods with parameters: "</span> <span class="token operator">+</span> method<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token punctuation">}</span>
-                    <span class="token comment" spellcheck="true">//用@Autowired修饰的注解可能不止一个，因此都加在currElements这个容器里面，一起处理</span>
-                    <span class="token keyword">boolean</span> required <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">determineRequiredStatus</span><span class="token punctuation">(</span>ann<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    PropertyDescriptor pd <span class="token operator">=</span> BeanUtils<span class="token punctuation">.</span><span class="token function">findPropertyForMethod</span><span class="token punctuation">(</span>bridgedMethod<span class="token punctuation">,</span> clazz<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    currElements<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">AutowiredAnnotationBeanPostProcessor<span class="token punctuation">.</span>AutowiredMethodElement</span><span class="token punctuation">(</span>method<span class="token punctuation">,</span> required<span class="token punctuation">,</span> pd<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token punctuation">}</span>
-
-            <span class="token punctuation">}</span>
-        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        elements<span class="token punctuation">.</span><span class="token function">addAll</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> currElements<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        targetClass <span class="token operator">=</span> targetClass<span class="token punctuation">.</span><span class="token function">getSuperclass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span> <span class="token keyword">while</span><span class="token punctuation">(</span>targetClass <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> targetClass <span class="token operator">!=</span> Object<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">InjectionMetadata</span><span class="token punctuation">(</span>clazz<span class="token punctuation">,</span> elements<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span></code></pre>
-<p>最后返回一个<code>InjectionMetadata</code>类，这个类包含两部分，一部分是处理的目标类，一部分是通过反射获取到的集合</p>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">InjectionMetadata</span> <span class="token punctuation">{</span>
-    <span class="token keyword">public</span> <span class="token function">InjectionMetadata</span><span class="token punctuation">(</span>Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> targetClass<span class="token punctuation">,</span> Collection<span class="token operator">&lt;</span>InjectionMetadata<span class="token punctuation">.</span>InjectedElement<span class="token operator">></span> elements<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">this</span><span class="token punctuation">.</span>targetClass <span class="token operator">=</span> targetClass<span class="token punctuation">;</span>
-        <span class="token keyword">this</span><span class="token punctuation">.</span>injectedElements <span class="token operator">=</span> elements<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span></code></pre>
-<p>得到InjectionMetadata开始执行注入：</p>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> PropertyValues <span class="token function">postProcessProperties</span><span class="token punctuation">(</span>PropertyValues pvs<span class="token punctuation">,</span> Object bean<span class="token punctuation">,</span> String beanName<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    InjectionMetadata metadata <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">findAutowiringMetadata</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> bean<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> pvs<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token keyword">try</span> <span class="token punctuation">{</span>
-        metadata<span class="token punctuation">.</span><span class="token function">inject</span><span class="token punctuation">(</span>bean<span class="token punctuation">,</span> beanName<span class="token punctuation">,</span> pvs<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">return</span> pvs<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">BeanCreationException</span> var6<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">throw</span> var6<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Throwable</span> var7<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">BeanCreationException</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> <span class="token string">"Injection of autowired dependencies failed"</span><span class="token punctuation">,</span> var7<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">inject</span><span class="token punctuation">(</span>Object target<span class="token punctuation">,</span> <span class="token annotation punctuation">@Nullable</span> String beanName<span class="token punctuation">,</span> <span class="token annotation punctuation">@Nullable</span> PropertyValues pvs<span class="token punctuation">)</span> <span class="token keyword">throws</span> Throwable <span class="token punctuation">{</span>
-    Collection<span class="token operator">&lt;</span>InjectionMetadata<span class="token punctuation">.</span>InjectedElement<span class="token operator">></span> checkedElements <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>checkedElements<span class="token punctuation">;</span>
-    Collection<span class="token operator">&lt;</span>InjectionMetadata<span class="token punctuation">.</span>InjectedElement<span class="token operator">></span> elementsToIterate <span class="token operator">=</span> checkedElements <span class="token operator">!=</span> null <span class="token operator">?</span> checkedElements <span class="token operator">:</span> <span class="token keyword">this</span><span class="token punctuation">.</span>injectedElements<span class="token punctuation">;</span>
-    InjectionMetadata<span class="token punctuation">.</span>InjectedElement element<span class="token punctuation">;</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span><span class="token punctuation">(</span>Collection<span class="token punctuation">)</span>elementsToIterate<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">for</span><span class="token punctuation">(</span>Iterator var6 <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>Collection<span class="token punctuation">)</span>elementsToIterate<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">iterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> var6<span class="token punctuation">.</span><span class="token function">hasNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> element<span class="token punctuation">.</span><span class="token function">inject</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> beanName<span class="token punctuation">,</span> pvs<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            element <span class="token operator">=</span> <span class="token punctuation">(</span>InjectionMetadata<span class="token punctuation">.</span>InjectedElement<span class="token punctuation">)</span>var6<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span>logger<span class="token punctuation">.</span><span class="token function">isTraceEnabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                logger<span class="token punctuation">.</span><span class="token function">trace</span><span class="token punctuation">(</span><span class="token string">"Processing injected element of bean '"</span> <span class="token operator">+</span> beanName <span class="token operator">+</span> <span class="token string">"': "</span> <span class="token operator">+</span> element<span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
-
-<span class="token punctuation">}</span></code></pre>
+                <h3 id="JVM内存分析"><a href="#JVM内存分析" class="headerlink" title="JVM内存分析"></a>JVM内存分析</h3><p>工作中，我们时常遇到OutOfMemoryError 异常，要想知道是怎么出现的内存溢出，要先从一张图说起：</p>
+<p>​ <img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/JVM%E5%86%85%E5%AD%98%E5%88%86%E6%9E%90.58x7xllhvdc0.webp" alt="JVM内存分析"></p>
+<h4 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h4><p>程序计数器（Program Counter Register）是一块较小的内存空间，它可以看作是当前线程所执行的字节码的行号指示器。</p>
+<p>由于 Java 虚拟机的多线程是通过线程轮流切换并分配处理器执行时间的方式来实现的，在任何一个确定的时刻，一个处理器内核都只会执行一条线程中的指令。</p>
+<p>因此，为了线程切换后能恢复到正确的执行位置，每条线程都需要有一个独立的程序计数器，各条线程之间计数器互不影响，独立存储，我们称这类内存区域为“线程私有”的内存。</p>
+<p>如果线程正在执行的是一个 Java 方法，这个计数器记录的是正在执行的虚拟机字节码指令的地址；如果正在执行的是 Native 方法，这个计数器值则为空（Undefined）。此内存区域是唯一一个在 Java 虚拟机规范中没有规定任何 OutOfMemoryError 情况的区域。</p>
+<h4 id="Java虚拟机栈"><a href="#Java虚拟机栈" class="headerlink" title="Java虚拟机栈"></a>Java虚拟机栈</h4><p>与程序计数器一样，Java 虚拟机栈（Java Virtual Machine Stacks）也是线程私有的，它的生命周期与线程相同。</p>
+<p>虚拟机栈描述的是 Java 方法执行的内存模型：每个方法在执行的同时都会创建一个栈帧（Stack Frame，是方法运行时的基础数据结构）用于存储局部变量表、操作数栈、动态链接、方法出口等信息。每一个方法从调用直至执行完成的过程，就对应着一个栈帧在虚拟机栈中入栈到出栈的过程。</p>
+<p>在活动线程中，只有位千栈顶的帧才是有效的，称为当前栈帧。正在执行的方法称为当前方法，栈帧是方法运行的基本结构。在执行引擎运行时，所有指令都只能针对当前栈帧进行操作。</p>
+<h5 id="1-局部变量表"><a href="#1-局部变量表" class="headerlink" title="1. 局部变量表"></a>1. 局部变量表</h5><p>局部变量表是存放方法参数和局部变量的区域。 局部变量没有准备阶段， 必须显式初始化。如果是非静态方法，<strong>则在 index[0] 位置上存储的是方法所属对象的实例引用</strong>，一个引用变量占 4 个字节，随后存储的是参数和局部变量。字节码指令中的 STORE 指令就是将操作栈中计算完成的局部变呈写回局部变量表的存储空间内。</p>
+<p>虚拟机栈规定了两种异常状况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出 StackOverflowError 异常；如果虚拟机栈可以动态扩展（当前大部分的 Java 虚拟机都可动态扩展），如果扩展时无法申请到足够的内存，就会抛出 OutOfMemoryError 异常。</p>
+<h5 id="2-操作栈"><a href="#2-操作栈" class="headerlink" title="2. 操作栈"></a>2. 操作栈</h5><p>操作栈是个初始状态为空的桶式结构栈。在方法执行过程中， 会有各种指令往<br>栈中写入和提取信息。JVM 的执行引擎是基于栈的执行引擎， 其中的栈指的就是操<br>作栈。字节码指令集的定义都是基于栈类型的，栈的深度在方法元信息的 stack 属性中。</p>
+<p><strong>i++ 和 ++i 的区别：</strong></p>
+<ol>
+<li>i++：从局部变量表取出 i 并压入操作栈(load memory)，然后对局部变量表中的 i 自增 1(add&amp;store memory)，将操作栈栈顶值取出使用，如此线程从操作栈读到的是自增之前的值。</li>
+<li>++i：先对局部变量表的 i 自增 1(load memory&amp;add&amp;store memory)，然后取出并压入操作栈(load memory)，再将操作栈栈顶值取出使用，线程从操作栈读到的是自增之后的值。</li>
+</ol>
+<p>之前之所以说 i++ 不是原子操作，即使使用 volatile 修饰也不是线程安全，就是因为，可能 i 被从局部变量表（内存）取出，压入操作栈（寄存器），操作栈中自增，使用栈顶值更新局部变量表（寄存器更新写入内存），其中分为 3 步，volatile 保证可见性，保证每次从局部变量表读取的都是最新的值，但可能这 3 步可能被另一个线程的 3 步打断，产生数据互相覆盖问题，从而导致 i 的值比预期的小。</p>
+<h5 id="3-动态链接"><a href="#3-动态链接" class="headerlink" title="3. 动态链接"></a>3. 动态链接</h5><p>每个栈帧中包含一个在常量池中对当前方法的引用， 目的是支持方法调用过程的动态连接。</p>
+<h5 id="4-方法返回地址"><a href="#4-方法返回地址" class="headerlink" title="4.方法返回地址"></a>4.方法返回地址</h5><p>方法执行时有两种退出情况：</p>
+<ol>
+<li>正常退出，即正常执行到任何方法的返回字节码指令，如 RETURN、IRETURN、ARETURN 等；</li>
+<li>异常退出。</li>
+</ol>
+<p>无论何种退出情况，都将返回至方法当前被调用的位置。方法退出的过程相当于弹出当前栈帧，退出可能有三种方式：</p>
+<ol>
+<li>返回值压入上层调用栈帧。</li>
+<li>异常信息抛给能够处理的栈帧。</li>
+<li>PC计数器指向方法调用后的下一条指令。</li>
+</ol>
+<h4 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h4><p>本地方法栈（Native Method Stack）与虚拟机栈所发挥的作用是非常相似的，它们之间的区别不过是虚拟机栈为虚拟机执行 Java 方法（也就是字节码）服务，而本地方法栈则为虚拟机使用到的 Native 方法服务。Sun HotSpot 虚拟机直接就把本地方法栈和虚拟机栈合二为一。与虚拟机栈一样，本地方法栈区域也会抛出 StackOverflowError 和 OutOfMemoryError 异常。</p>
+<p>线程开始调用本地方法时，会进入 个不再受 JVM 约束的世界。本地方法可以通过 JNI(Java Native Interface)来访问虚拟机运行时的数据区，甚至可以调用寄存器，具有和 JVM 相同的能力和权限。 当大量本地方法出现时，势必会削弱 JVM 对系统的控制力，因为它的出错信息都比较黑盒。对内存不足的情况，本地方法栈还是会抛出 nativeheapOutOfMemory。</p>
+<p>JNI 类本地方法最著名的应该是 <code>System.currentTimeMillis()</code> ，JNI使 Java 深度使用操作系统的特性功能，复用非 Java 代码。 但是在项目过程中， 如果大量使用其他语言来实现 JNI , 就会丧失跨平台特性。</p>
+<h4 id="Java堆"><a href="#Java堆" class="headerlink" title="Java堆"></a>Java堆</h4><p>对于大多数应用来说，Java 堆（Java Heap）是 Java 虚拟机所管理的内存中最大的一块。Java 堆是被所有线程共享的一块内存区域，在虚拟机启动时创建。此内存区域的唯一目的就是存放对象实例，几乎所有的对象实例都在这里分配内存。</p>
+<p>堆是垃圾收集器管理的主要区域，因此很多时候也被称做“GC堆”（Garbage Collected Heap）。从内存回收的角度来看，由于现在收集器基本都采用分代收集算法，所以 Java 堆中还可以细分为：新生代和老年代；再细致一点的有 Eden 空间、From Survivor 空间、To Survivor 空间等。从内存分配的角度来看，线程共享的 Java 堆中可能划分出多个线程私有的分配缓冲区（Thread Local Allocation Buffer,TLAB）。</p>
+<p>Java 堆可以处于物理上不连续的内存空间中，只要逻辑上是连续的即可，当前主流的虚拟机都是按照可扩展来实现的（通过 -Xmx 和 -Xms 控制）。如果在堆中没有内存完成实例分配，并且堆也无法再扩展时，将会抛出 OutOfMemoryError 异常。</p>
+<h4 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h4><p>方法区（Method Area）与 Java 堆一样，是各个线程共享的内存区域，它用于存储已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。虽然<br>Java 虚拟机规范把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫做 Non-Heap（非堆），目的应该是与 Java 堆区分开来。</p>
+<p>Java 虚拟机规范对方法区的限制非常宽松，除了和 Java 堆一样不需要连续的内存和可以选择固定大小或者可扩展外，还可以选择不实现垃圾收集。垃圾收集行为在这个区域是比较少出现的，其内存回收目标主要是针对常量池的回收和对类型的卸载。当方法区无法满足内存分配需求时，将抛出 OutOfMemoryError 异常。</p>
+<p><strong>JDK8 之前，Hotspot 中方法区的实现是永久代（Perm），JDK8 开始使用元空间（Metaspace），以前永久代所有内容的字符串常量移至堆内存，其他内容移至元空间，元空间直接在本地内存分配。</strong></p>
+<p>为什么要使用元空间取代永久代的实现？</p>
+<ol>
+<li>字符串存在永久代中，容易出现性能问题和内存溢出。</li>
+<li>类及方法的信息等比较难确定其大小，因此对于永久代的大小指定比较困难，太小容易出现永久代溢出，太大则容易导致老年代溢出。</li>
+<li>永久代会为 GC 带来不必要的复杂度，并且回收效率偏低。</li>
+<li>将 HotSpot 与 JRockit 合二为一。</li>
+</ol>
+<h5 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h5><p>运行时常量池（Runtime Constant Pool）是方法区的一部分。Class 文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池（Constant Pool Table），用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后进入方法区的运行时常量池中存放。</p>
+<p>一般来说，除了保存 Class 文件中描述的符号引用外，还会把翻译出来的直接引用也存储在运行时常量池中。</p>
+<p>运行时常量池相对于 Class 文件常量池的另外一个重要特征是具备动态性，Java 语言并不要求常量一定只有编译期才能产生，也就是并非预置入 Class 文件中常量池的内容才能进入方法区运行时常量池，运行期间也可能将新的常量放入池中，这种特性被开发人员利用得比较多的便是 String 类的 intern() 方法。</p>
+<p>既然运行时常量池是方法区的一部分，自然受到方法区内存的限制，当常量池无法再申请到内存时会抛出 OutOfMemoryError 异常。</p>
+<h4 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h4><p>直接内存（Direct Memory）并不是虚拟机运行时数据区的一部分，也不是 Java 虚拟机规范中定义的内存区域。</p>
+<p>在 JDK 1.4 中新加入了 NIO，引入了一种基于通道（Channel）与缓冲区（Buffer）的 I/O 方式，它可以使用 Native 函数库直接分配堆外内存，然后通过一个存储在 Java 堆中的 DirectByteBuffer 对象作为这块内存的引用进行操作。这样能在一些场景中显著提高性能，因为避免了在 Java 堆和 Native 堆中来回复制数据。</p>
+<p>显然，本机直接内存的分配不会受到 Java 堆大小的限制，但是，既然是内存，肯定还是会受到本机总内存（包括 RAM 以及 SWAP 区或者分页文件）大小以及处理器寻址空间的限制。服务器管理员在配置虚拟机参数时，会根据实际内存设置 -Xmx 等参数信息，但经常忽略直接内存，使得各个内存区域总和大于物理内存限制（包括物理的和操作系统级的限制），从而导致动态扩展时出现 OutOfMemoryError 异常。</p>
+<h3 id="JMM内存模型"><a href="#JMM内存模型" class="headerlink" title="JMM内存模型"></a>JMM内存模型</h3><p>Java内存模型是共享内存的并发模型，线程之间主要通过读-写共享变量(堆内存中的实例域，静态域和数组元素)来完成隐式通信。</p>
+<p>Java内存模型（JMM）控制Java线程之间的通信，决定一个线程对共享变量的写入何时对另一个线程可见。</p>
+<p>Java内存模型规定<strong>所有的变量都存储在主内存</strong>中，包括实例变量，静态变量，但是不包括局部变量和方法参数。每个线程都有自己的工作内存，<strong>线程的工作内存保存了该线程用到的变量和主内存的副本拷贝，线程对变量的操作都在工作内存中进行。线程不能直接读写主内存中的变量。</strong></p>
+<p><strong>就像每个处理器内核拥有私有的高速缓存一样，JMM中每个线程拥有私有的本地缓存</strong></p>
+<p>用一张图解释一下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/JMM%E5%86%85%E5%AD%98%E5%88%86%E6%9E%90.3rntwqkr9a40.webp" alt="JMM内存分析"></p>
+<p>线程A和线程B通信要经过两个步骤：</p>
+<ol>
+<li>线程A把本地内存A中更新过的共享变量刷新到主内存中</li>
+<li>线程B到主内存中去读线程A之前已经更新过的共享变量</li>
+</ol>
+<p><strong>JMM通过控制每个线程的本地内存和主内存的交互，来保证数据的可见性。</strong></p>
+<p>每个线程的工作内存都是独立的，线程操作数据只能在工作内存中进行，然后刷回到主存。这是 Java 内存模型定义的线程基本工作方式。</p>
+<h4 id="重排序和happens-before规则"><a href="#重排序和happens-before规则" class="headerlink" title="重排序和happens-before规则"></a>重排序和happens-before规则</h4><h5 id="重排序"><a href="#重排序" class="headerlink" title="重排序"></a>重排序</h5><p>在执行程序时为了提高性能，编译器和处理器常常会对指令做重排序。重排序分三种类型：</p>
+<ol>
+<li>编译器优化的重排序。编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。</li>
+<li>指令级并行的重排序。现代处理器采用了指令级并行技术（Instruction-Level Parallelism， ILP）来将多条指令重叠执行。如果不存在数据依赖性，处理器可以改变语句对应机器指令的执行顺序。</li>
+<li>内存系统的重排序。由于处理器使用缓存和读 / 写缓冲区，这使得加载和存储操作看上去可能是在乱序执行。</li>
+</ol>
+<p>从 java 源代码到最终实际执行的指令序列，会分别经历下面三种重排序：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/%E9%87%8D%E6%8E%92%E5%BA%8F.5qh2asmyum80.webp" alt="重排序"></p>
+<p>JMM属于语言级的内存模型，它确保在不同的编译器和不同的处理器平台之上，通过禁止特定类型的编译器重排序和处理器重排序，为程序员提供一致的内存可见性保证。</p>
+<p>Java编译器禁止处理器重排序是通过在生成指令序列的适当位置插入内存屏障（重排序时不能把后面的指令重排序到内存指令之前的位置）指令来实现的。</p>
+<h5 id="happens-before"><a href="#happens-before" class="headerlink" title="happens-before"></a>happens-before</h5><p>从 JDK5 开始，java 内存模型提出了 happens-before 的概念，通过这个概念来阐述操作之间的内存可见性。</p>
+<p>如果一个操作执行的结果需要对另一个操作可见，那么这两个操作之间必须存在 happens-before 关系。这里提到的两个操作既可以是在一个线程之内，也可以是在不同线程之间。</p>
+<p><strong>这里的“可见性”是指当一条线程修改了这个变量的值，新值对于其他线程来说是可以立即得知的。</strong></p>
+<p>如果 A happens-before B，那么 Java 内存模型将向程序员保证—— A 操作的结果将对 B 可见，且 A 的执行顺序排在 B 之前。</p>
+<p>重要的 happens-before 规则如下：</p>
+<ol>
+<li>程序顺序规则：一个线程中的每个操作，happens- before 于该线程中的任意后续操作。</li>
+<li>监视器锁规则：对一个监视器锁的解锁，happens- before 于随后对这个监视器锁的加锁。</li>
+<li>volatile 变量规则：对一个 volatile 域的写，happens- before 于任意后续对这个 volatile 域的读。</li>
+<li>传递性：如果 A happens- before B，且 B happens- before C，那么 A happens- before C。</li>
+</ol>
+<h4 id="volatile关键字"><a href="#volatile关键字" class="headerlink" title="volatile关键字"></a>volatile关键字</h4><p>volatile 可以说是 JVM 提供的最轻量级的同步机制，当一个变量定义为volatile之后，它将具备两种特性：</p>
+<ol>
+<li><strong>保证此变量对所有线程的可见性。</strong>而普通变量不能做到这一点，普通变量的值在线程间传递均需要通过主内存来完成。</li>
+</ol>
+<p>注意，volatile 虽然保证了可见性，但是 Java 里面的运算并非原子操作，导致 volatile 变量的运算在并发下一样是不安全的。而 synchronized 关键字则是由“一个变量在同一个时刻只允许一条线程对其进行 lock 操作”这条规则获得线程安全的。</p>
+<ol>
+<li><strong>禁止指令重排序优化。</strong>普通的变量仅仅会保证在该方法的执行过程中所有依赖赋值结果的地方都能获取到正确的结果，而不能保证变量赋值操作的顺序与程序代码中的执行顺序一致。</li>
+</ol>
+<p><strong>总结下来就是：Java内存模型定义了共享内存系统中多线程程序读写操作行为的规范，Java内存模型也就是为了解决这个并发编程问题而存在的。</strong></p>
+<h3 id="常见知识点"><a href="#常见知识点" class="headerlink" title="常见知识点"></a>常见知识点</h3><h4 id="JMM定义了什么？"><a href="#JMM定义了什么？" class="headerlink" title="JMM定义了什么？"></a>JMM定义了什么？</h4><p>个Java内存模型实际上是围绕着三个特征建立起来的。分别是：原子性，可见性，有序性。</p>
+<ul>
+<li><p>原子性：在一个操作中CPU 不可以在中途暂停然后再调度，要么不执行，要么就执行完成。</p>
+</li>
+<li><p>可见性：多个线程访问同一个变量时，一个线程修改了这个变量的值，其他线程能够立即看得到修改后的值。</p>
+</li>
+<li><p>有序性：程序执行的顺序按照代码的先后顺序执行，而不能瞎几把重排，导致程序出现不一致的结果。</p>
+</li>
+</ul>
+<p>缓存一致性问题其实就是可见性问题，而处理器优化是可以导致原子性问题的，指令重排即会导致有序性问题。</p>
+<h4 id="内存模型怎么解决并发问题的？"><a href="#内存模型怎么解决并发问题的？" class="headerlink" title="内存模型怎么解决并发问题的？"></a>内存模型怎么解决并发问题的？</h4><p>内存模型解决并发问题主要采用两种方式，分别是限制处理器优化，另一种是使用了内存屏障。</p>
+<p>对于这两种方式，Java底层其实已经封装好了一些关键字，关于解决并发编程中的原子性问题，Java底层封装了Synchronized，来保证方法和代码块内的操作都是原子性的；而至于可见性问题，Java底层则封装了Volatile，将被修饰的变量在修改后立即同步到主内存中；至于有效性问题，其实也就是我们所说的重排序问题，Volatile关键字也会禁止指令的重排序，而Synchroinzed关键字由于保证了同一时刻只允许一条线程操作，自然也就保证了有序性。</p>
+<h4 id="说说看线程之间的通信机制有哪些呢？Java的并发采用的是哪种？"><a href="#说说看线程之间的通信机制有哪些呢？Java的并发采用的是哪种？" class="headerlink" title="说说看线程之间的通信机制有哪些呢？Java的并发采用的是哪种？"></a>说说看线程之间的通信机制有哪些呢？Java的并发采用的是哪种？</h4><p>线程之间的通信机制可以分为两种，分别是：</p>
+<ul>
+<li>共享内存</li>
+<li>消息传递</li>
+</ul>
+<p>目前Java的并发通信采用的是共享内存的方式。</p>
+<h4 id="说说看你对内存模型的理解吧？"><a href="#说说看你对内存模型的理解吧？" class="headerlink" title="说说看你对内存模型的理解吧？"></a>说说看你对内存模型的理解吧？</h4><p>内存模型是吗？请问下是JVM的内存模型呢？还是Java内存模型，也就是JMM呢？</p>
+<p>JMM其实并不像JVM内存模型一样是真实存在的，它只是一个抽象的规范。在不同的硬件或者操作系统下，对内存的访问逻辑都有一定的差异，而这种差异会导致同一套代码在不同操作系统或者硬件下，得到了不同的结果，而JMM的存在就是为了解决这个问题，通过JMM的规范，保证Java程序在各种平台下对内存的访问都能得到一致的效果。</p>
+<p><em>JMM的概念其实比较容易忘记，所以我这边特地表明了它是为了解决上面问题而存在的，通过理解它是什么，用来做什么，比较容易产生深度记忆。</em></p>
+<h4 id="说说JMM定义了哪些操作来完成主内存和工作内存的交互操作？"><a href="#说说JMM定义了哪些操作来完成主内存和工作内存的交互操作？" class="headerlink" title="说说JMM定义了哪些操作来完成主内存和工作内存的交互操作？"></a>说说JMM定义了哪些操作来完成主内存和工作内存的交互操作？</h4><p><img src="https://cdn.jsdelivr.net/gh/Passion-Logan/blog-image@main/JMM%E4%BA%A4%E4%BA%92%E6%93%8D%E4%BD%9C.61ybf8gr5tc0.webp" alt="JMM交互操作"></p>
+<ul>
+<li>lock(锁定)，作用于主内存中的变量，把变量标识为线程独占的状态。</li>
+<li>read(读取)，作用于主内存的变量，把变量的值从主内存传输到线程的工作内存中，以便下一步的load操作使用。</li>
+<li>load(加载)，作用于工作内存的变量，把read操作主存的变量放入到工作内存的变量副本中。</li>
+<li>use(使用)，作用于工作内存的变量，把工作内存中的变量传输到执行引擎，每当虚拟机遇到一个需要使用到变量的值的字节码指令时将会执行这个操作。</li>
+<li>assign(赋值)，作用于工作内存的变量，它把一个从执行引擎中接受到的值赋值给工作内存的变量副本中，每当虚拟机遇到一个给变量赋值的字节码指令时将会执行这个操作。</li>
+<li>store(存储)，作用于工作内存的变量，它把一个从工作内存中一个变量的值传送到主内存中，以便后续的write使用。</li>
+<li>write(写入)：作用于主内存中的变量，它把store操作从工作内存中得到的变量的值放入主内存的变量中。</li>
+<li>unlock(解锁)：作用于主内存的变量，它把一个处于锁定状态的变量释放出来，释放后的变量才可以被其他线程锁定。</li>
+</ul>
+<p>我再补充一下JMM对8种内存交互操作制定的规则吧：</p>
+<ul>
+<li>不允许read、load、store、write操作之一单独出现，也就是read操作后必须load，store操作后必须write。</li>
+<li>不允许线程丢弃他最近的assign操作，即工作内存中的变量数据改变了之后，必须告知主存。</li>
+<li>不允许线程将没有assign的数据从工作内存同步到主内存。</li>
+<li>一个新的变量必须在主内存中诞生，不允许工作内存直接使用一个未被初始化的变量。就是对变量实施use、store操作之前，必须经过load和assign操作。</li>
+<li>一个变量同一时间只能有一个线程对其进行lock操作。多次lock之后，必须执行相同次数unlock才可以解锁。</li>
+<li>如果对一个变量进行lock操作，会清空所有工作内存中此变量的值。在执行引擎使用这个变量前，必须重新load或assign操作初始化变量的值。</li>
+<li>如果一个变量没有被lock，就不能对其进行unlock操作。也不能unlock一个被其他线程锁住的变量。</li>
+<li>一个线程对一个变量进行unlock操作之前，必须先把此变量同步回主内存。</li>
+</ul>
+<h4 id="说说对内存交互基本操作的三个特性的理解？"><a href="#说说对内存交互基本操作的三个特性的理解？" class="headerlink" title="说说对内存交互基本操作的三个特性的理解？"></a>说说对内存交互基本操作的三个特性的理解？</h4><p>JMM基本可以说是围绕着在并发中如何处理这三个特性而建立起来的，也就是原子性、可见性、以及有序性。</p>
+<p>所谓的原子性指的就是一个操作或者多个操作要么全部执行并且执行的过程不会被任何因素打断，要么就都不执行。</p>
+<p>可见性是指当多个线程访问同一个变量时，一个线程修改了这个变量的值，其他线程能够立即看得到修改的值。</p>
+<p>有序性即程序执行的顺序按照代码的先后顺序执行。</p>
+<h4 id="那Java如何来保证原子性操作呢？"><a href="#那Java如何来保证原子性操作呢？" class="headerlink" title="那Java如何来保证原子性操作呢？"></a>那Java如何来保证原子性操作呢？</h4><p>JMM只保证了基本读取和赋值是原子性的操作，但是如果要实现更大范围操作的原子性，则可以通过synchroinzed和lock来实现，synchronized和lock能够保证任一时刻只有一个线程执行该代码块，从而保证了原子性。</p>
+<h4 id="你说说看Java用什么来保证可见性的？"><a href="#你说说看Java用什么来保证可见性的？" class="headerlink" title="你说说看Java用什么来保证可见性的？"></a>你说说看Java用什么来保证可见性的？</h4><p>对可见性来说，Java提供了volatile关键字来保证可见性，而synchronized和lock也能够保证可见性，synchronized和lock能保证同一时刻只有一个线程获取锁然后执行同步代码，并且在释放锁之前会将对变量的修改刷新到主存当中，因此可以保证可见性。</p>
+<h4 id="说说看volatile如何生效的？"><a href="#说说看volatile如何生效的？" class="headerlink" title="说说看volatile如何生效的？"></a>说说看volatile如何生效的？</h4><p>当一个共享变量被volatile修饰时，它会保证修改的值被立即更新到主内存中，当有其他线程读取该值时，也不会直接读取工作内存中的值，而是直接去主内存中读取。</p>
+<p>而普通的共享变量不能保证可见性的，因为普通共享变量被修改后，写写入了工作内存中，什么时候写入主内存其实是不可知的，当其他线程去读取是，此时无论是工作内存还是主内存，可能还是原来的值，因此无法保证可见性。</p>
+<h4 id="说说看Java是如何保证有序性的？"><a href="#说说看Java是如何保证有序性的？" class="headerlink" title="说说看Java是如何保证有序性的？"></a>说说看Java是如何保证有序性的？</h4><p>首先，Java里边可以通过synchronized和lock来保证有序性，synchronized和Lock可以保证每个时刻是有一个线程执行同步代码，相当于是让线程按照顺序的执行同步代码，自然也就保证了有序性。</p>
+<p>另外Java内存模型也通过happens-before原则来保证有序性。</p>
+<h4 id="讲一下volatile关键字吧"><a href="#讲一下volatile关键字吧" class="headerlink" title="讲一下volatile关键字吧"></a>讲一下volatile关键字吧</h4><p>很多并发编程都使用了volatile关键字，主要的作用包括两点：</p>
+<ol>
+<li><strong>保证线程间变量的可见性。</strong></li>
+<li><strong>禁止CPU进行指令重排序。</strong></li>
+</ol>
+<h4 id="说说-synchronized-关键字和-volatile-关键字的区别"><a href="#说说-synchronized-关键字和-volatile-关键字的区别" class="headerlink" title="说说 synchronized 关键字和 volatile 关键字的区别"></a>说说 synchronized 关键字和 volatile 关键字的区别</h4><p><code>synchronized</code> 关键字和 <code>volatile</code> 关键字是两个互补的存在，而不是对立的存在！</p>
+<ul>
+<li><strong><code>volatile</code> 关键字</strong>是线程同步的<strong>轻量级实现</strong>，所以 <strong><code>volatile</code> 性能肯定比<code>synchronized</code>关键字要好</strong> 。但是 <strong><code>volatile</code> 关键字只能用于变量而 <code>synchronized</code> 关键字可以修饰方法以及代码块</strong> 。</li>
+<li><strong><code>volatile</code> 关键字能保证数据的可见性，但不能保证数据的原子性。<code>synchronized</code> 关键字两者都能保证。</strong></li>
+<li><strong><code>volatile</code>关键字主要用于解决变量在多个线程之间的可见性，而 <code>synchronized</code> 关键字解决的是多个线程之间访问资源的同步性。</strong></li>
+</ul>
 
             </div>
             <hr/>
@@ -610,7 +671,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://www.wangqilong.net/2021/01/15/autowired-zhu-jie-zi-dong-zhu-ru-de-yuan-li/">https://www.wangqilong.net/2021/01/15/autowired-zhu-jie-zi-dong-zhu-ru-de-yuan-li/</a>
+                    <a href="https://www.wangqilong.net/2021/05/27/jvm-he-jmm/">https://www.wangqilong.net/2021/05/27/jvm-he-jmm/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -648,8 +709,8 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Spring/">
-                                    <span class="chip bg-color">Spring</span>
+                                <a href="/tags/Java/">
+                                    <span class="chip bg-color">Java</span>
                                 </a>
                             
                         </div>
@@ -954,46 +1015,50 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2021/01/24/mybatis-yi-ge-sql-de-zhi-xing-guo-cheng/">
+                <a href="/2021/05/27/jvm-he-jmm/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="Mybatis一个SQL的执行过程">
+                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="JVM和JMM">
                         
-                        <span class="card-title">Mybatis一个SQL的执行过程</span>
+                        <span class="card-title">JVM和JMM</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            Mybatis的所有语句的执行都是通过SqlSession对象来操作的，SqlSession是由SqlSessionFactory类生成的。首先根据配置文件来创建一个SqlSessionFactory，然后调用openSession来获取一
+                            JVM内存分析工作中，我们时常遇到OutOfMemoryError 异常，要想知道是怎么出现的内存溢出，要先从一张图说起：
+​ 
+程序计数器程序计数器（Program Counter Register）是一块较小的内存空间，它可以看作是当前
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-01-24
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-05-27
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Mybatis/" class="post-category">
-                                    Mybatis
+                            <a href="/categories/Java/" class="post-category">
+                                    Java
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Mybatis/">
-                        <span class="chip bg-color">Mybatis</span>
+                    <a href="/tags/Java/">
+                        <span class="chip bg-color">Java</span>
                     </a>
                     
                 </div>
@@ -1007,31 +1072,35 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/01/09/docker-yuan-cheng-an-quan-lian-jie/">
+                <a href="/2021/04/10/she-ji-mo-shi/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="Docker远程安全连接">
+                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="设计模式">
                         
-                        <span class="card-title">Docker远程安全连接</span>
+                        <span class="card-title">设计模式</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            配置Docker远程连接，我们可以配合Docker插件在本地打包就自动上传并创建容器，不用我们再去服务器中手动创建。网上的讲解大多都是直接开放一个端口就直接完事，这样自己玩玩可以，用于正式项目的话不出几个小时就会被扫描到进而被攻击，这次我们
+                            设计模式是软件开发过程中面临的一般问题解决方案，每种模式都描述了一个我们周围不断重复发生的问题，以及该问题的核心解决方案。
+设计模式主要分三种类型：
+
+创建型：主要解决对象的创建问题，封装复杂的创建过程量，解耦对象的创建代码和使用代码
+结构
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-01-09
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-04-10
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Docker/" class="post-category">
-                                    Docker
+                            <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" class="post-category">
+                                    设计模式
                                 </a>
                             
                             
@@ -1041,8 +1110,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Docker/">
-                        <span class="chip bg-color">Docker</span>
+                    <a href="/tags/Java/">
+                        <span class="chip bg-color">Java</span>
                     </a>
                     
                 </div>
