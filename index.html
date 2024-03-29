@@ -34,7 +34,8 @@
 
 <body>
     <header class="navbar-fixed">
-    <nav id="headNav" class="bg-color nav-transparent">
+    <!-- <nav id="headNav" class="bg-color nav-transparent"> -->
+    <nav id="headNav" class="bg-color">
         <div id="navContainer" class="nav-wrapper container">
             <div class="brand-logo">
                 <a href="/" class="waves-effect waves-light">
@@ -304,7 +305,7 @@
 
 </header>
 
-    
+    <!-- 
 <style>
     .carousel-control {
         width: 45px;
@@ -358,24 +359,13 @@
         <div class="brand">
             <div class="title center-align">
                 
-                小驿站
+                 
                 
             </div>
 
             <div class="description center-align">
                 
-                <span id="subtitle"></span>
-                <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
-                <script>
-                    var typed = new Typed("#subtitle", {
-                        strings: ['学无止境。','逆水行舟, 不进则退。'],
-                        startDelay: 300,
-                        typeSpeed: 100,
-                        loop: true,
-                        backSpeed: 50,
-                        showCursor: true
-                    });
-                </script>
+                    
                 
             </div>
         </div>
@@ -500,129 +490,40 @@
     });
 </script>
 
+ -->
 
+  <div class="bg-cover pd-header about-cover">
+    <div class="container">
+    <div class="row">
+    <div class="col s10 offset-s1 m8 offset-m2 l8 offset-l2">
+        <div class="brand">
+            <div class="title center-align">
+                
+                 
+                
+            </div>
+
+            <div class="description center-align">
+                
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $('.bg-cover').css('background-image', 'url(/medias/banner/0.jpg)');
+</script>
+
+
+    </div>
+</div>
+  <!-- 
 
 <main class="content">
 
-    
-    <div id="indexCard" class="index-card">
-        <div class="container ">
-            <div class="card">
-                <div class="card-content">
-                    
-                        <div class="dream">
-    
-    <div class="title center-align">
-        <i class="far fa-lightbulb"></i>&nbsp;&nbsp;名言
-    </div>
-    
-    <div class="row">
-        <div class="col l8 offset-l2 m10 offset-m1 s10 offset-s1 center-align text">
-            阅读使人充实，会谈使人敏捷，写作使人精确。——培根
-        </div>
-    </div>
-</div>
-
-                    
-
-                    
-
-                    
-
-                    
-                    <div id="recommend-sections" class="recommend">
-                        
-
-
-
-
-
-<div class="title"><i class="far fa-thumbs-up"></i>&nbsp;&nbsp;推荐文章</div>
-
-<div class="row">
-
-    
-    
-    <div class="col s12" >
-        <div class="post-card" style="background-image: url('/medias/featureimages/7.jpg')">
-            <div class="post-body">
-                <div class="post-categories">
-                    
-                        
-                            <a href="/categories/Java/" class="category">Java</a>
-                        
-                    
-                </div>
-                <a href="/2021/05/27/jvm-he-jmm/">
-                    <h3 class="post-title">JVM和JMM</h3>
-                </a>
-                <p class="post-description">JVM内存分析工作中，我们时常遇到OutOfMemoryError 异常，要想知道是怎么出现的内存溢出，要先从一张图说起：
-​ 
-程序计数器程序计数器（Program C</p>
-                <a href="/2021/05/27/jvm-he-jmm/" class="read-more btn waves-effect waves-light" style="background: linear-gradient(to right, #FF5E3A 0%, #FF2A68 100%)" target="_blank">
-                    <i class="icon far fa-eye fa-fw"></i>阅读更多
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    
-    <div class="col s12 m6" data-aos="zoom-in-up">
-        <div class="post-card" style="background-image: url('/medias/featureimages/2.jpg')">
-            <div class="post-body">
-                <div class="post-categories">
-                    
-                        
-                            <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category">数据库</a>
-                        
-                    
-                </div>
-                <a href="/2021/01/28/mysql-de-shi-wu-ri-zhi/">
-                    <h3 class="post-title">MySQL的事务日志</h3>
-                </a>
-                <p class="post-description">MySQL的日志主要有三种：binlog(二进制日志)，redo log(重做日志)，undo log(回滚日志)
-
-redo log 是物</p>
-                <a href="/2021/01/28/mysql-de-shi-wu-ri-zhi/" class="read-more btn waves-effect waves-light" style="background: linear-gradient(to right, #EF4DB6 0%, #C643FC 100%)" target="_blank">
-                    <i class="icon far fa-eye fa-fw"></i>阅读更多
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    
-    <div class="col s12 m6" data-aos="zoom-in-up">
-        <div class="post-card" style="background-image: url('/medias/featureimages/14.jpg')">
-            <div class="post-body">
-                <div class="post-categories">
-                    
-                        
-                            <a href="/categories/Java/" class="category">Java</a>
-                        
-                    
-                </div>
-                <a href="/2019/07/03/java-suo-de-fen-lei-zong-jie/">
-                    <h3 class="post-title">Java锁的分类总结</h3>
-                </a>
-                <p class="post-description">锁在Java中充当了十分重要的角色，不同的锁在不同的场景下能够大大提高程序的运行效率。文章将对不同锁做一个简单的总结。
-首先附上两张分类图：</p>
-                <a href="/2019/07/03/java-suo-de-fen-lei-zong-jie/" class="read-more btn waves-effect waves-light" style="background: linear-gradient(to right, #1AD6FD 0%, #1D62F0 100%)" target="_blank">
-                    <i class="icon far fa-eye fa-fw"></i>阅读更多
-                </a>
-            </div>
-        </div>
-    </div>
-    
-
-</div>
-
-
-                    </div>
-                    
-                </div>
-            </div>
-        </div>
-    </div>
     
 
     
@@ -1447,6 +1348,8 @@ $(function () {
 
     
 
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
     
 
     
